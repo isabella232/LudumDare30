@@ -1,29 +1,37 @@
 import java.awt.event.KeyEvent;
 
-public class Player extends Entity
+public class Player extends SpriteObject
 {
-	private static final float PLAYER_SIZE = 0.05f;
-
+	private static final long SECOND = 1000000000L;
+	private static final long DISABLE_LENGTH = 3 * SECOND;
+	private long         m_disableTime;
 	private boolean      m_isActive;
-	private float        m_width;
-	private float        m_height;
-	private final Bitmap m_image;
 
 	public boolean GetIsActive() { return m_isActive; }
-
-	public void SetIsActive(boolean val) { m_isActive = val; }
+	public void SetIsActive(boolean val) 
+	{ 
+		if(val == true 
+		 && System.nanoTime() >= 
+		 	(m_disableTime + DISABLE_LENGTH))
+		{
+			m_isActive = val;
+		}
+		else
+		{
+			m_isActive = val;
+			m_disableTime = System.nanoTime();
+		}
+	}
 	
 	public Player(boolean isActive, float x, float y, 
 			float width, float height)
 	{
-		super(x, y, Util.VectorLength(width * PLAYER_SIZE,
-					height * PLAYER_SIZE));
+		super(x, y, width, height,
+				new Bitmap(100, 100)
+				.ClearScreen((byte)0x00, (byte)0x00, 
+					(byte)0x00, (byte)0xFF));
 		m_isActive = isActive;
-		m_width = width * PLAYER_SIZE;
-		m_height = height * PLAYER_SIZE;
-
-		m_image = new Bitmap(100, 100);
-		m_image.ClearScreen((byte)0x00, (byte)0x00, (byte)0x00, (byte)0xFF);
+		m_disableTime = 0;
 	}
 
 	@Override
@@ -49,12 +57,5 @@ public class Player extends Entity
 				SetX(GetX() - delta * speed);
 			}
 		}
-	}
-
-	@Override
-	public void Render(RenderContext target)
-	{
-		target.DrawImage(m_image, GetX(), GetY(),
-			m_width, m_height);
 	}
 }

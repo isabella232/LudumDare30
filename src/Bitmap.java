@@ -152,7 +152,7 @@ public class Bitmap
 				m_components[srcIndex + 3]); 
 	}
 
-	public void ClearScreen(byte a, byte b, byte g, byte r)
+	public Bitmap ClearScreen(byte a, byte b, byte g, byte r)
 	{
 		for(int i = 0; i < GetWidth() * GetHeight(); i++)
 		{
@@ -161,6 +161,8 @@ public class Bitmap
 			SetComponent(i * 4 + 2, g);
 			SetComponent(i * 4 + 3, r);
 		}
+
+		return this;
 	}
 
 }
