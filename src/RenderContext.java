@@ -142,15 +142,15 @@ public class RenderContext extends Bitmap
 		}
 	}
 
-//	public void FillRect(int x, int y, int width, int height,
-//			byte a, byte b, byte g, byte r)
-//	{
-//		for(int j = y; j < y + height; j++)
-//		{
-//			for(int i = x; i < x + width; i++)
-//			{
-//				DrawPixel(i, j, a, b, g, r);
-//			}
-//		}
-//	}
+	public void FillRect(int x, int y, int width, int height,
+			byte a, byte b, byte g, byte r)
+	{
+		for(int j = y; j < y + height; j++)
+		{
+			for(int i = x; i < x + width; i++)
+			{
+				DrawPixel(i, j, a, b, g, r);
+			}
+		}
+	}
 }

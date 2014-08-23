@@ -44,6 +44,18 @@ public class Stars3D
 	/** The star positions on the Z axis */
 	private final float m_starZ[];
 
+	private float m_centerX;
+	private float m_centerY;
+
+	public void SetCenterX(float val)
+	{
+		m_centerX = val;
+	}
+	public void SetCenterY(float val)
+	{
+		m_centerY = val;
+	}
+
 	/**
 	 * Creates a new 3D star field in a usable state.
 	 *
@@ -53,6 +65,8 @@ public class Stars3D
 	 */
 	public Stars3D(int numStars, float spread, float speed)
 	{
+		m_centerX = 0.0f;
+		m_centerY = 0.0f;
 		m_spread = spread;
 		m_speed = speed;
 
@@ -117,8 +131,10 @@ public class Stars3D
 			//remaps the positions from range (-1, 1) to (0, size)
 
 			//Division by z*tanHalfFOV moves things in to create a perspective effect.
-			int x = (int)((m_starX[i]/(m_starZ[i] * tanHalfFOV)) * halfWidth + halfWidth);
-			int y = (int)((m_starY[i]/(m_starZ[i] * tanHalfFOV)) * halfHeight + halfHeight);
+
+			int x = (int)(((m_starX[i]/(m_starZ[i] * tanHalfFOV)) + m_centerX) * halfWidth + halfWidth);
+			int y = (int)(((m_starY[i]/(m_starZ[i] * tanHalfFOV)) + m_centerY) * halfHeight + halfHeight);
+
 //
 //			int x = (int)((m_starX[i]) * halfWidth + halfWidth);
 //			int y = (int)((m_starY[i]) * halfHeight + halfHeight);

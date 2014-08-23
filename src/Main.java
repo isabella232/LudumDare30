@@ -38,8 +38,7 @@ public class Main
 	{
 		Display display = new Display(800, 600, "Software Rendering");
 		Game game = new Game();
-		//Stars3D stars = new Stars3D(4096, 64.0f, 20.0f);
-
+		
 		long previousTime = System.nanoTime();
 		while(true)
 		{
@@ -49,7 +48,7 @@ public class Main
 
 			game.Update(display.GetInput(), delta);
 			game.Render(display.GetContext());
-			//stars.UpdateAndRender(target, delta);
+			//
 			display.SwapBuffers();
 			try
 			{

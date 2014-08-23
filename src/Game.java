@@ -7,15 +7,20 @@ public class Game
 
 	private final ArrayList<Entity> m_laserStarts;
 	private final ArrayList<Entity> m_laserEnds;
+	private final Stars3D           m_stars;
+	private float                   m_delta;
+	private final Entity            m_mainPlayer;
 
 	public Game()
 	{
 		m_entities    = new ArrayList<Entity>();
 		m_laserStarts = new ArrayList<Entity>();
 		m_laserEnds   = new ArrayList<Entity>();
+		m_stars = new Stars3D(4096, 64.0f, 4.0f);
 
-		m_entities.add(new Player(true, -1.0f, -1.0f,
-					1.0f, 1.0f));
+		m_mainPlayer = new Player(true, -1.0f, -1.0f,
+					1.0f, 1.0f);
+		m_entities.add(m_mainPlayer);
 
 		for(int i = 0; i < 10; i++)
 		{
@@ -28,6 +33,7 @@ public class Game
 
 	public void Update(Input input, float delta)
 	{
+		m_delta = delta;
 		for(int i = 0; i < m_entities.size(); i++)
 		{
 			m_entities.get(i).Update(input, delta);
@@ -65,11 +71,15 @@ public class Game
 				}
 			}
 		}
+
+//		m_stars.SetCenterX(m_mainPlayer.GetX());
+//		m_stars.SetCenterY(m_mainPlayer.GetY());
 	}
 
 	public void Render(RenderContext target)
 	{
-		target.Clear((byte)0x00);
+		m_stars.UpdateAndRender(target, m_delta);
+		//target.Clear((byte)0x00);
 
 		if(m_laserStarts.size() != m_laserEnds.size())
 		{
@@ -92,9 +102,18 @@ public class Game
 		{
 			m_entities.get(i).Render(target);
 		}
-//		//10bf79
-//		//79bf10
-//		target.DrawLine(0.1f, 0.1f, 0.3f, 0.5f,
-//				(byte)0x00, (byte)0x79, (byte)0xbf, (byte)0x10);
+		
+		int clampEnd = target.GetWidth() < target.GetHeight() ? 
+			target.GetWidth() :
+			target.GetHeight();
+		int clampStartY = (clampEnd - target.GetHeight()) / -2;
+		int clampStartX = (clampEnd - target.GetWidth()) / -2;
+		int clampEndX = clampEnd + clampStartX;
+		int clampEndY = clampEnd + clampStartY;
+
+		target.FillRect(0, 0, clampStartX, target.GetHeight(), 
+				(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00);
+		target.FillRect(clampEndX, 0, target.GetWidth() - clampEndX, target.GetHeight(), 
+				(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00);
 	}
 }
