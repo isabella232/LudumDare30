@@ -104,6 +104,22 @@ public class Bitmap
 		m_components[index + 3] = r;
 	}
 
+	public void SafeDrawPixel(int x, int y, byte a, byte b, byte g, byte r)
+	{
+		int clampEnd = GetWidth() < GetHeight() ? GetWidth() :
+			GetHeight();
+		int clampStartY = (clampEnd - GetHeight()) / -2;
+		int clampStartX = (clampEnd - GetWidth()) / -2;
+		if(x < clampStartX || y < clampStartY 
+		  || x >= (clampEnd + clampStartX) 
+		  || y >= (clampEnd + clampStartY))
+		{
+			return;
+		}
+
+		DrawPixel(x, y, a, b, g, r);
+	}
+
 	/**
 	 * Copies the Bitmap into a BGR byte array.
 	 */
