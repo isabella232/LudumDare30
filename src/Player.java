@@ -8,15 +8,56 @@ public class Player extends SpriteObject
 	private long         m_disableTime;
 	private boolean      m_isActive;
 	private final ArrayList<Player> m_children;
+	private final ArrayList<Player> m_childrenToRemove;
+
+	public void AddChildrenToArray(ArrayList<Entity> dest)
+	{
+		for(int i = 0; i < m_children.size(); i++)
+		{
+			m_children.get(i).AddChildrenToArray(dest);
+			dest.add(m_children.get(i));
+		}
+		m_children.clear();
+		m_childrenToRemove.clear();
+	}
 
 	public void AddChild(Player other)
 	{
+		if(ContainsObject(other))
+		{
+			System.out.println("Adding existing object");
+			new Exception().printStackTrace();
+			System.exit(1);
+		}
 		m_children.add(other);
+	}
+
+	public void RemoveChild(Player other)
+	{
+		m_childrenToRemove.add(other);
+	}
+
+	public boolean ContainsObject(Player other)
+	{
+		if(this == other)
+		{
+			return true;
+		}
+
+		for(int i = 0; i < m_children.size(); i++)
+		{
+			if(m_children.get(i).ContainsObject(other))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public Player CheckCollisionRecursive(Player other)
 	{
-		if(SphereIntersect(other))
+		if(this != other && SphereIntersect(other))
 		{
 			return this;
 		}
@@ -66,16 +107,23 @@ public class Player extends SpriteObject
 	public boolean GetIsActive() { return m_isActive; }
 	public void SetIsActive(boolean val) 
 	{ 
-		if(val == true 
-		 && System.nanoTime() >= 
-		 	(m_disableTime + DISABLE_LENGTH))
+		if(val == true)
 		{
-			m_isActive = val;
+			if(System.nanoTime() >= 
+				(m_disableTime + DISABLE_LENGTH))
+			{
+				m_isActive = val;
+			}
 		}
 		else
 		{
 			m_isActive = val;
 			m_disableTime = System.nanoTime();
+
+		}
+		for(int i = 0; i < m_children.size(); i++)
+		{
+			m_children.get(i).SetIsActive(val);
 		}
 	}
 	
@@ -88,6 +136,7 @@ public class Player extends SpriteObject
 					(byte)0x00, (byte)0xFF));
 		m_isActive = isActive;
 		m_children = new ArrayList<Player>();
+		m_childrenToRemove = new ArrayList<Player>();
 		m_disableTime = 0;
 	}
 
@@ -113,12 +162,18 @@ public class Player extends SpriteObject
 			{
 				SetX(GetX() - delta * speed);
 			}
-		}
 
-		for(int i = 0; i < m_children.size(); i++)
-		{
-			m_children.get(i).Update(input, delta);
+			for(int i = 0; i < m_children.size(); i++)
+			{
+				m_children.get(i).Update(input, delta);
+			}
 		}
+		
+		for(int i = 0; i < m_childrenToRemove.size(); i++)
+		{
+			m_children.remove(m_childrenToRemove.get(i));
+		}
+		m_childrenToRemove.clear();
 	}
 
 	@Override
@@ -138,10 +193,18 @@ public class Player extends SpriteObject
 				}
 			}
 		}
-
+		
 		for(int i = 0; i < m_children.size(); i++)
 		{
-			m_children.get(i).Render(target);
+			try
+			{
+				m_children.get(i).Render(target);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
 		super.Render(target);
 	}

@@ -5,11 +5,8 @@ public class Game
 {
 	private final ArrayList<Entity>  m_entities;
 	private final ArrayList<Entity>  m_toRemove;
+	private final ArrayList<Entity>  m_toAdd;
 
-//	private final ArrayList<Player>  m_laserStarts;
-//	private final ArrayList<Player>  m_laserEnds;
-//	private final ArrayList<Player>  m_laserStartToRemove;
-//	private final ArrayList<Player>  m_laserEndToRemove;
 	private final Stars3D            m_stars;
 	private float                    m_delta;
 	private final Player             m_mainPlayer;
@@ -18,10 +15,7 @@ public class Game
 	{
 		m_entities           = new ArrayList<Entity>();
 		m_toRemove           = new ArrayList<Entity>();
-//		m_laserStarts        = new ArrayList<Player>();
-//		m_laserEnds          = new ArrayList<Player>();
-//		m_laserStartToRemove = new ArrayList<Player>();
-//		m_laserEndToRemove   = new ArrayList<Player>();
+		m_toAdd              = new ArrayList<Entity>();
 		m_stars = new Stars3D(4096, 64.0f, 4.0f);
 
 		m_mainPlayer = new Player(true, -1.0f, -1.0f,
@@ -53,12 +47,25 @@ public class Game
 
 	public void Update(Input input, float delta)
 	{
+		if(input.GetKey(KeyEvent.VK_E))
+		{
+			if(m_mainPlayer.GetIsActive())
+			{
+				m_mainPlayer.SetIsActive(false);
+			}
+			else
+			{
+				m_mainPlayer.SetIsActive(true);
+			}
+		}
+
 		m_delta = delta;
 		for(int i = 0; i < m_entities.size(); i++)
 		{
 			m_entities.get(i).Update(input, delta);
 		}
 
+		Player[] laserResult = new Player[2];
 		for(int i = 0; i < m_entities.size(); i++)
 		{
 			if(m_entities.get(i) instanceof Player
@@ -70,13 +77,14 @@ public class Game
 
 				if(result != null)
 				{
-					result.AddChild(other);
-					m_toRemove.add(other);
 					other.SetIsActive(true);
+					if(other.GetIsActive())
+					{
+						result.AddChild(other);
+						m_toRemove.add(other);
+					}
 				}
 			}
-
-			Player[] laserResult = new Player[2];
 
 			if(m_entities.get(i) instanceof 
 					DestroyableObject)
@@ -94,19 +102,28 @@ public class Game
 
 				laserResult[0] = null;
 				laserResult[1] = null;
-//
-//				for(int j = 0; j < m_laserStarts.size();j++)
-//				{
-//					Entity start = m_laserStarts.get(j);
-//					Entity end   = m_laserEnds.get(j);
-//
-//					if(current.LineIntersect(
-//						start.GetX(), start.GetY(), 
-//						end.GetX(), end.GetY()))
-//					{
-//						m_toRemove.add(current);
-//					}
-//				}
+			}
+
+			if(m_entities.get(i) instanceof 
+					BlockingObject)
+			{
+				BlockingObject current = 
+					(BlockingObject)m_entities.get(i);
+
+				m_mainPlayer.CheckLaserCollision(current,
+						laserResult);
+
+				if(laserResult[0] != null && laserResult[0]
+						!= m_mainPlayer)
+				{
+					m_mainPlayer.RemoveChild(laserResult[0]);
+					laserResult[0].SetIsActive(false);
+					m_toAdd.add(laserResult[0]);
+					laserResult[0].AddChildrenToArray(m_toAdd);
+				}
+
+				laserResult[0] = null;
+				laserResult[1] = null;
 			}
 		}
 
@@ -116,28 +133,11 @@ public class Game
 		}
 		m_toRemove.clear();
 
-//		for(int i = 0; i < m_entities.size(); i++)
-//		{
-//			if(m_entities.get(i) instanceof 
-//					DestroyableObject)
-//			{
-//				DestroyableObject current = 
-//					(DestroyableObject)m_entities.get(i);
-//
-//				for(int j = 0; j < m_laserStarts.size();j++)
-//				{
-//					Entity start = m_laserStarts.get(j);
-//					Entity end   = m_laserEnds.get(j);
-//
-//					if(current.LineIntersect(
-//						start.GetX(), start.GetY(), 
-//						end.GetX(), end.GetY()))
-//					{
-//						m_toRemove.add(current);
-//					}
-//				}
-//			}
-//
+		for(int i = 0; i < m_toAdd.size(); i++)
+		{
+			m_entities.add(m_toAdd.get(i));
+		}
+		m_toAdd.clear();
 //			if(m_entities.get(i) instanceof BlockingObject)
 //			{
 //				BlockingObject current = 
@@ -159,13 +159,6 @@ public class Game
 //			}
 //
 //		}
-//
-//		for(int i = 0; i < m_toRemove.size(); i++)
-//		{
-//			m_entities.remove(m_toRemove.get(i));
-//		}
-//		m_toRemove.clear();
-//
 //		if(m_laserStartToRemove.size() != m_laserEndToRemove.size())
 //		{
 //			System.err.println("Error: Laser start/end removal list has fallen "
@@ -249,23 +242,6 @@ public class Game
 	{
 		m_stars.UpdateAndRender(target, m_delta);
 		//target.Clear((byte)0x00);
-
-//		if(m_laserStarts.size() != m_laserEnds.size())
-//		{
-//			System.err.println("Error: Laser start/end has fallen "
-//					+ "out of alignment");
-//			System.exit(1);
-//		}
-//
-//		for(int i = 0; i < m_laserStarts.size(); i++)
-//		{
-//			Entity start = m_laserStarts.get(i);
-//			Entity end   = m_laserEnds.get(i);
-//
-//			target.DrawLine(start.GetX(), start.GetY(),
-//				   	end.GetX(), end.GetY(),
-//				(byte)0x00, (byte)0x79, (byte)0xbf, (byte)0x10);
-//		}
 
 		for(int i = 0; i < m_entities.size(); i++)
 		{
