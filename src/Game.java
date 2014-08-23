@@ -4,6 +4,7 @@ import java.util.*;
 public class Game
 {
 	private final ArrayList<Entity> m_entities;
+	private final ArrayList<Entity> m_toRemove;
 
 	private final ArrayList<Entity> m_laserStarts;
 	private final ArrayList<Entity> m_laserEnds;
@@ -14,6 +15,7 @@ public class Game
 	public Game()
 	{
 		m_entities    = new ArrayList<Entity>();
+		m_toRemove    = new ArrayList<Entity>();
 		m_laserStarts = new ArrayList<Entity>();
 		m_laserEnds   = new ArrayList<Entity>();
 		m_stars = new Stars3D(4096, 64.0f, 4.0f);
@@ -27,6 +29,13 @@ public class Game
 			float x = (float)Math.random();
 			float y = (float)Math.random();
 			m_entities.add(new Player(false, x, y,
+						0.5f, 0.5f));
+		}
+		for(int i = 0; i < 10; i++)
+		{
+			float x = (float)Math.random();
+			float y = (float)-Math.random();
+			m_entities.add(new DestroyableObject(x, y,
 						0.5f, 0.5f));
 		}
 	}
@@ -72,8 +81,32 @@ public class Game
 			}
 		}
 
-//		m_stars.SetCenterX(m_mainPlayer.GetX());
-//		m_stars.SetCenterY(m_mainPlayer.GetY());
+		for(int i = 0; i < m_entities.size(); i++)
+		{
+			if(m_entities.get(i) instanceof DestroyableObject)
+			{
+				DestroyableObject current = (DestroyableObject)m_entities.get(i);
+
+				for(int j = 0; j < m_laserStarts.size();j++)
+				{
+					Entity start = m_laserStarts.get(j);
+					Entity end   = m_laserEnds.get(j);
+
+					if(current.LineIntersect(
+						start.GetX(), start.GetY(), 
+						end.GetX(), end.GetY()))
+					{
+						m_toRemove.add(current);
+					}
+				}
+			}
+		}
+
+		for(int i = 0; i < m_toRemove.size(); i++)
+		{
+			m_entities.remove(m_toRemove.get(i));
+		}
+		m_toRemove.clear();
 	}
 
 	public void Render(RenderContext target)
