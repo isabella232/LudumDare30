@@ -1,9 +1,7 @@
-3D Software Renderer
+Ludum Dare 30
 ==
 
-thebennybox 3D Software Renderer 
-
-Tutorial found here: https://www.youtube.com/playlist?list=PLEETnX-uPtBUbVOok816vTl1K9vV1GgH5
+thebennybox game for Ludum Dare 30
 
 ##Build Dependencies##
 - [JAVA](https://www.java.com/en/download/)
