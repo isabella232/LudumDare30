@@ -167,27 +167,58 @@ public class Game
 
 			start.SetIsActive(false);
 			end.SetIsActive(false);
-			
-			m_laserStarts.remove(start);
-			m_laserEnds.remove(end);
 
-			int startIndexInLaserEnd = 
-				m_laserEnds.indexOf(start);
-			
-			if(startIndexInLaserEnd != -1)
+			int index = m_laserEnds.indexOf(start);
+			while(index != -1)
 			{
-				m_laserStarts.remove(startIndexInLaserEnd);					m_laserEnds.remove(startIndexInLaserEnd);				}
-
-			int endIndexInLaserStart = 
-				m_laserStarts.indexOf(end);
-
-			if(endIndexInLaserStart != -1)
+				m_laserStarts.remove(index);
+				m_laserEnds.remove(index);
+				index = m_laserEnds.indexOf(start);
+			}
+			index = m_laserStarts.indexOf(start);
+			while(index != -1)
 			{
-				m_laserStarts.remove(endIndexInLaserStart);					m_laserEnds.remove(endIndexInLaserStart);
+				m_laserStarts.remove(index);
+				m_laserEnds.remove(index);
+				index = m_laserStarts.indexOf(start);
+			}
+
+			index = m_laserEnds.indexOf(end);
+			while(index != -1)
+			{
+				m_laserStarts.remove(index);
+				m_laserEnds.remove(index);
+				index = m_laserEnds.indexOf(end);
+			}
+			index = m_laserStarts.indexOf(end);
+			while(index != -1)
+			{
+				m_laserStarts.remove(index);
+				m_laserEnds.remove(index);
+				index = m_laserStarts.indexOf(end);
 			}
 		}
 		m_laserStartToRemove.clear();
 		m_laserEndToRemove.clear();
+
+		for(int i = 0; i < m_entities.size(); i++)
+		{
+			if(m_entities.get(i) instanceof Player)
+			{
+				Player current = 
+					(Player)m_entities.get(i);
+				if(current == m_mainPlayer)
+				{
+					continue;
+				}
+
+				if(!m_laserStarts.contains(current)
+					&& !m_laserEnds.contains(current))
+				{
+					current.SetIsActive(false);
+				}
+			}
+		}
 	}
 
 	public void Render(RenderContext target)
