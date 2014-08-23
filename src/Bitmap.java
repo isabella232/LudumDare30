@@ -66,6 +66,11 @@ public class Bitmap
 	/** Basic getter */
 	public int GetHeight() { return m_height; }
 
+	public void SetComponent(int location, byte value)
+	{
+		m_components[location] = value;
+	}
+
 	/**
 	 * Creates and initializes a Bitmap.
 	 *
@@ -111,4 +116,35 @@ public class Bitmap
 			dest[i * 3 + 2] = m_components[i * 4 + 3];
 		}
 	}
+
+	public void CopyNearest(Bitmap dest, int destX, 
+		int destY, float srcXFloat, float srcYFloat)
+	{
+		int srcX = (int)(srcXFloat * (GetWidth()-1));
+		int srcY = (int)(srcYFloat * (GetHeight()-1));
+		
+		int destIndex = (destX+destY*dest.GetWidth())*4;
+		int srcIndex = (srcX+srcY*GetWidth())*4;
+
+		dest.SetComponent(destIndex, 
+				m_components[srcIndex]); 
+		dest.SetComponent(destIndex + 1, 
+				m_components[srcIndex + 1]); 
+		dest.SetComponent(destIndex + 2, 
+				m_components[srcIndex + 2]); 
+		dest.SetComponent(destIndex + 3, 
+				m_components[srcIndex + 3]); 
+	}
+
+	public void ClearScreen(byte a, byte b, byte g, byte r)
+	{
+		for(int i = 0; i < GetWidth() * GetHeight(); i++)
+		{
+			SetComponent(i * 4    , a);
+			SetComponent(i * 4 + 1, b);
+			SetComponent(i * 4 + 2, g);
+			SetComponent(i * 4 + 3, r);
+		}
+	}
+
 }
