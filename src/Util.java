@@ -13,4 +13,9 @@ public class Util
 
 		return val;
 	}
+
+	public static float VectorLength(float x, float y)
+	{
+		return (float)Math.sqrt(x * x + y * y);
+	}
 }

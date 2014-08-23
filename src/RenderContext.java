@@ -26,8 +26,10 @@ public class RenderContext extends Bitmap
 		}
 	}
 
-	public void DrawImage(Bitmap image, float xStart, float yStart, float width, float height)
+	public void DrawImage(Bitmap image, float xCenter, float yCenter, float width, float height)
 	{
+		float xStart = xCenter - width/2.0f;
+		float yStart = yCenter - height/2.0f;
 		float xEnd = xStart + width;
 		float yEnd = yStart + height;
 
